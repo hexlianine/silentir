@@ -3,8 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from .config import OutputFormat, TimestampMode, load_settings
-from .exceptions import ModelInferenceError
+from .exceptions import ConfigurationError, ModelInferenceError
 from .models.base import ChatProvider, ProviderUnavailable
 from .models.ollama_provider import OllamaProvider
 from .models.openai_compatible_provider import OpenAICompatibleProvider
@@ -12,7 +11,7 @@ from .noters import NoterRegistry, default_noter_registry
 from .recorders import RecorderRegistry, default_recorder_registry
 from .summarizers import BaseSummarizer, HierarchicalSummarizer
 from .transcribers import BaseTranscriber, WhisperASRTranscriber
-from .types import NoteResult
+from .types import NoteResult, OutputFormat, ProviderPolicy, TimestampMode
 
 
 @dataclass
@@ -21,7 +20,7 @@ class ProviderCandidate:
     model: str
 
 
-def provider_order(policy: str) -> list[str]:
+def provider_order(policy: ProviderPolicy) -> list[str]:
     if policy == "local_first":
         return ["local", "online"]
     if policy == "online_first":
@@ -53,18 +52,25 @@ class VideoNotesOrchestrator:
         url: str,
         language: str | None,
         output_format: OutputFormat,
-        provider_policy: str,
-        local_model: str,
-        online_model: str,
+        provider_policy: ProviderPolicy,
+        local_model: str | None,
+        online_model: str | None,
+        ollama_host: str,
+        openai_base_url: str,
+        openai_api_key: str | None,
         include_timestamps: TimestampMode,
         write_path: str | None,
         cookies_path: str | None,
     ) -> NoteResult:
-        settings = load_settings(
-            provider_policy=provider_policy,
-            local_model=local_model,
-            online_model=online_model,
-        )
+        allowed = {"local_first", "online_first", "local_only", "online_only"}
+        if provider_policy not in allowed:
+            raise ConfigurationError(
+                f"Invalid provider policy '{provider_policy}'. Allowed: {sorted(allowed)}"
+            )
+        if local_model is None and online_model is None:
+            raise ConfigurationError(
+                "At least one model must be configured: local_model or online_model."
+            )
 
         recorder = self._recorder_registry.match(url)
         metadata, transcript, warnings = recorder.record(
@@ -74,21 +80,25 @@ class VideoNotesOrchestrator:
         )
 
         if transcript is None:
-            audio_path, temp_dir = recorder.download_audio(url, cookies_path=cookies_path)
+            audio_path, temp_dir = recorder.download_audio(
+                url, cookies_path=cookies_path
+            )
             try:
                 transcript = self._transcriber.transcribe(audio_path, language=language)
             finally:
                 temp_dir.cleanup()
 
-        effective_language = transcript.language if language in {None, "auto"} else language
+        effective_language = (
+            transcript.language if language in {None, "auto"} else language
+        )
 
         providers = self._provider_candidates(
-            policy=settings.provider_policy,
-            local_model=settings.local_model,
-            online_model=settings.online_model,
-            ollama_host=settings.ollama_host,
-            openai_base_url=settings.openai_base_url,
-            openai_api_key=settings.openai_api_key,
+            policy=provider_policy,
+            local_model=local_model,
+            online_model=online_model,
+            ollama_host=ollama_host,
+            openai_base_url=openai_base_url,
+            openai_api_key=openai_api_key,
         )
 
         last_err: Exception | None = None
@@ -141,9 +151,9 @@ class VideoNotesOrchestrator:
     @staticmethod
     def _provider_candidates(
         *,
-        policy: str,
-        local_model: str,
-        online_model: str,
+        policy: ProviderPolicy,
+        local_model: str | None,
+        online_model: str | None,
         ollama_host: str,
         openai_base_url: str,
         openai_api_key: str | None,
@@ -152,20 +162,22 @@ class VideoNotesOrchestrator:
         candidates: list[ProviderCandidate] = []
         for item in order:
             if item == "local":
-                candidates.append(
-                    ProviderCandidate(
-                        provider=OllamaProvider(host=ollama_host),
-                        model=local_model,
+                if local_model is not None:
+                    candidates.append(
+                        ProviderCandidate(
+                            provider=OllamaProvider(host=ollama_host),
+                            model=local_model,
+                        )
                     )
-                )
             else:
-                candidates.append(
-                    ProviderCandidate(
-                        provider=OpenAICompatibleProvider(
-                            base_url=openai_base_url,
-                            api_key=openai_api_key,
-                        ),
-                        model=online_model,
+                if online_model is not None:
+                    candidates.append(
+                        ProviderCandidate(
+                            provider=OpenAICompatibleProvider(
+                                base_url=openai_base_url,
+                                api_key=openai_api_key,
+                            ),
+                            model=online_model,
+                        )
                     )
-                )
         return candidates

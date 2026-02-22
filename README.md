@@ -1,6 +1,6 @@
 # silent
 
-The `silent` project, which generates structured notes from YouTube and Bilibili URLs using local (`Ollama`) or online (`OpenAI-compatible`) models. or online LLMs. Added core functionality including environment configuration, CLI interface, and support for multiple output formats. Implemented video recording, transcription, and summarization features, along with necessary models and exception handling.
+The `silent` project generates structured notes from YouTube and Bilibili URLs using local (`Ollama`) or online (`OpenAI-compatible`) models.
 
 ## Install
 
@@ -12,6 +12,12 @@ Optional ASR dependencies:
 
 ```bash
 uv sync --extra asr
+```
+
+Optional example dependencies (`examples/basic_usage.py`):
+
+```bash
+uv sync --extra examples
 ```
 
 Install dev/test dependencies:
@@ -39,6 +45,11 @@ result = generate_notes(
     "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     language="auto",
     provider_policy="local_first",
+    local_model="qwen2.5:7b-instruct",
+    online_model="gpt-4.1-mini",
+    ollama_host="http://localhost:11434",
+    openai_base_url="https://api.openai.com/v1",
+    openai_api_key=None,
 )
 print(result.note_markdown)
 ```
@@ -49,14 +60,13 @@ Run tests:
 uv run pytest
 ```
 
-## Environment Variables
+Architecture and pipeline details:
 
-- `VIDEO_NOTES_PROVIDER_POLICY`
-- `VIDEO_NOTES_OLLAMA_HOST`
-- `VIDEO_NOTES_OPENAI_BASE_URL`
-- `VIDEO_NOTES_OPENAI_API_KEY`
-- `VIDEO_NOTES_LOCAL_MODEL`
-- `VIDEO_NOTES_ONLINE_MODEL`
+- `docs/architecture.md`
+
+## Explicit Configuration
+
+All runtime configuration is explicit. Use CLI flags or Python function arguments instead of environment variables.
 
 ## Notes
 

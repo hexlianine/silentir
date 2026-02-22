@@ -3,6 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
 
+ProviderPolicy = Literal["local_first", "online_first", "local_only", "online_only"]
+OutputFormat = Literal["markdown", "text", "json"]
+TimestampMode = Literal["section", "point", "none"]
+
 
 @dataclass
 class Segment:
