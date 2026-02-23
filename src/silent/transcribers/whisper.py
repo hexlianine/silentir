@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from .base import BaseTranscriber
 from ..exceptions import TranscriptExtractionError
 from ..types import Segment, Transcript
+from .base import BaseTranscriber
 
 
 class WhisperASRTranscriber(BaseTranscriber):
@@ -23,7 +23,8 @@ class WhisperASRTranscriber(BaseTranscriber):
             except Exception as whisper_exc:
                 raise TranscriptExtractionError(
                     "ASR transcription failed. Install 'faster-whisper' or 'openai-whisper', "
-                    f"or provide subtitles. faster-whisper error: {faster_exc}; whisper error: {whisper_exc}"
+                    "or provide subtitles. "
+                    f"faster-whisper error: {faster_exc}; whisper error: {whisper_exc}"
                 ) from whisper_exc
 
     def _transcribe_faster_whisper(self, audio_path: str, *, language: str | None) -> Transcript:

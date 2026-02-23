@@ -12,7 +12,8 @@ class PromptBuilder:
     def chunk_user_prompt(self, chunk_text: str, start_sec: float, end_sec: float) -> str:
         return (
             f"Chunk timestamp window: {start_sec:.1f}s to {end_sec:.1f}s\n"
-            "Create a concise bullet summary of this chunk with important details and decisions:\n\n"
+            "Create a concise bullet summary of this chunk "
+            "with important details and decisions:\n\n"
             f"{chunk_text}"
         )
 

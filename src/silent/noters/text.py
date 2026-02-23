@@ -5,7 +5,6 @@ import re
 from ..types import NoteResult
 from .base import BaseNoter
 
-
 _HEADER_RE = re.compile(r"^#{1,6}\s*", flags=re.MULTILINE)
 
 

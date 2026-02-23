@@ -80,17 +80,13 @@ class VideoNotesOrchestrator:
         )
 
         if transcript is None:
-            audio_path, temp_dir = recorder.download_audio(
-                url, cookies_path=cookies_path
-            )
+            audio_path, temp_dir = recorder.download_audio(url, cookies_path=cookies_path)
             try:
                 transcript = self._transcriber.transcribe(audio_path, language=language)
             finally:
                 temp_dir.cleanup()
 
-        effective_language = (
-            transcript.language if language in {None, "auto"} else language
-        )
+        effective_language = transcript.language if language in {None, "auto"} else language
 
         providers = self._provider_candidates(
             policy=provider_policy,

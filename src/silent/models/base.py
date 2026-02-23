@@ -9,7 +9,15 @@ class ChatProvider(ABC):
     name: str
 
     @abstractmethod
-    def chat(self, *, model: str, system_prompt: str, user_prompt: str, temperature: float = 0.2, max_tokens: int = 1200) -> str:
+    def chat(
+        self,
+        *,
+        model: str,
+        system_prompt: str,
+        user_prompt: str,
+        temperature: float = 0.2,
+        max_tokens: int = 1200,
+    ) -> str:
         raise NotImplementedError
 
 

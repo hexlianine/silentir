@@ -3,8 +3,6 @@ from __future__ import annotations
 import argparse
 import sys
 
-from .logging import LoggingSettings, setup_logger
-
 from .api import generate_notes
 from .exceptions import (
     ConfigurationError,
@@ -12,13 +10,12 @@ from .exceptions import (
     TranscriptExtractionError,
     UnsupportedURLError,
 )
+from .logging import LoggingSettings, setup_logger
 from .noters import default_noter_registry
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Generate structured notes from video URLs"
-    )
+    parser = argparse.ArgumentParser(description="Generate structured notes from video URLs")
     parser.add_argument("url", help="YouTube or Bilibili video URL")
     parser.add_argument("--language", default="auto", help="Target language or 'auto'")
     parser.add_argument(
@@ -53,12 +50,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--log-format", default=None)
     parser.add_argument("--log-date-format", default=None)
     parser.add_argument("--log-file", default=None)
-    parser.add_argument(
-        "--out", dest="out", default=None, help="Optional output file path"
-    )
-    parser.add_argument(
-        "--cookies", dest="cookies", default=None, help="Optional cookies.txt path"
-    )
+    parser.add_argument("--out", dest="out", default=None, help="Optional output file path")
+    parser.add_argument("--cookies", dest="cookies", default=None, help="Optional cookies.txt path")
     return parser
 
 

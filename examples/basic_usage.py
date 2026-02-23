@@ -5,7 +5,6 @@ import os
 from silent import generate_notes
 from silent.logging import LoggingSettings, setup_logger
 
-
 if __name__ == "__main__":
     setup_logger(
         LoggingSettings(

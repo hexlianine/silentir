@@ -60,6 +60,22 @@ Run tests:
 uv run pytest
 ```
 
+## Lint And Format
+
+Install Git hooks:
+
+```bash
+uv run pre-commit install
+```
+
+Run checks manually:
+
+```bash
+uv run pre-commit run --all-files
+uv run ruff check .
+uv run ruff format .
+```
+
 Architecture and pipeline details:
 
 - `docs/architecture.md`

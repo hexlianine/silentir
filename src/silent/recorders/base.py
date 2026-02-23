@@ -100,7 +100,9 @@ class BaseRecorder(ABC):
         except Exception as exc:
             raise TranscriptExtractionError(f"Failed to extract metadata/subtitles: {exc}") from exc
 
-    def _record_subtitle_transcript(self, info: dict, *, language: str | None = None) -> Transcript | None:
+    def _record_subtitle_transcript(
+        self, info: dict, *, language: str | None = None
+    ) -> Transcript | None:
         preferred: list[str] = []
         if language and language != "auto":
             preferred.append(language)
