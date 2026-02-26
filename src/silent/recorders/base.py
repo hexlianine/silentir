@@ -170,9 +170,7 @@ class RecorderRegistry:
         for recorder in self._recorders:
             if recorder.supports(url):
                 return recorder
-        raise UnsupportedURLError(
-            "Unsupported URL. MVP currently supports YouTube and Bilibili URLs."
-        )
+        raise UnsupportedURLError("Unsupported URL. Currently supports YouTube and Bilibili URLs.")
 
 
 def normalized_domain(url: str) -> str:

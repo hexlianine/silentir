@@ -12,7 +12,7 @@ if __name__ == "__main__":
         )
     )
     result = generate_notes(
-        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "https://www.youtube.com/watch?v=MuWTmEiNe1g",
         language="auto",
         provider_policy="local_first",
         ollama_host="http://localhost:11434",

@@ -20,6 +20,12 @@ Optional example dependencies (`examples/basic_usage.py`):
 uv sync --extra examples
 ```
 
+Optional Streamlit UI dependencies:
+
+```bash
+uv sync --extra ui
+```
+
 Install dev/test dependencies:
 
 ```bash
@@ -89,3 +95,14 @@ All runtime configuration is explicit. Use CLI flags or Python function argument
 - Subtitle-first transcription is used by default.
 - If subtitles are unavailable, ASR transcriber fallback is used.
 - Runtime provider fallback follows `provider_policy`.
+
+## Streamlit UI
+
+Run the web UI:
+
+```bash
+uv run --extra ui streamlit run examples/basic_ui.py
+```
+
+The UI exposes the same configuration options as the CLI and lets you preview and download generated notes.
+You can also provide an optional `write path` to persist the rendered notes directly to a file.
