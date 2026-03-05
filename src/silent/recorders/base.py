@@ -59,6 +59,11 @@ class BaseRecorder(ABC):
             "quiet": True,
             "no_warnings": True,
             "outtmpl": outtmpl,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android", "web"],
+                }
+            },
         }
         if cookies_path:
             opts["cookiefile"] = cookies_path
@@ -90,6 +95,11 @@ class BaseRecorder(ABC):
             "no_warnings": True,
             "writesubtitles": True,
             "writeautomaticsub": True,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android", "web"],
+                }
+            },
         }
         if cookies_path:
             opts["cookiefile"] = cookies_path
