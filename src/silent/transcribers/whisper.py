@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from ..exceptions import TranscriptExtractionError
+from ..logging import get_logger
 from ..types import Segment, Transcript
 from .base import BaseTranscriber
+
+logger = get_logger(__name__)
 
 
 class WhisperASRTranscriber(BaseTranscriber):
@@ -16,11 +19,14 @@ class WhisperASRTranscriber(BaseTranscriber):
         language: str | None = None,
     ) -> Transcript:
         try:
+            logger.debug("Attempting transcription with faster-whisper...")
             return self._transcribe_faster_whisper(audio_path, language=language)
         except Exception as faster_exc:
+            logger.debug("faster-whisper failed: %s. Falling back to openai-whisper...", faster_exc)
             try:
                 return self._transcribe_openai_whisper(audio_path, language=language)
             except Exception as whisper_exc:
+                logger.error("All Whisper backends failed.")
                 raise TranscriptExtractionError(
                     "ASR transcription failed. Install 'faster-whisper' or 'openai-whisper', "
                     "or provide subtitles. "
@@ -43,6 +49,7 @@ class WhisperASRTranscriber(BaseTranscriber):
                 segments.append(Segment(start=float(seg.start), end=float(seg.end), text=text))
 
         detected = getattr(info, "language", None) or language or "unknown"
+        logger.info("faster-whisper transcription complete. Detected language: %s", detected)
         return Transcript(language=detected, source="asr", segments=segments)
 
     def _transcribe_openai_whisper(self, audio_path: str, *, language: str | None) -> Transcript:
@@ -67,4 +74,5 @@ class WhisperASRTranscriber(BaseTranscriber):
                 )
 
         detected = result.get("language") or language or "unknown"
+        logger.info("openai-whisper transcription complete. Detected language: %s", detected)
         return Transcript(language=detected, source="asr", segments=segments)

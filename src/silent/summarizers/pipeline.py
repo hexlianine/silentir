@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
+from ..logging import get_logger
 from ..models.base import ChatProvider
 from ..types import Transcript
 from .chunker import TranscriptChunker
 from .prompts import PromptBuilder
+
+logger = get_logger(__name__)
 
 
 class BaseSummarizer(ABC):
@@ -43,10 +46,15 @@ class HierarchicalSummarizer(BaseSummarizer):
     ) -> str:
         chunks = self._chunker.chunk(transcript)
         if not chunks:
+            logger.warning("No transcript content available for summarization.")
             return "## Overview\n\nNo transcript content available."
 
+        logger.info("Transcript split into %d chunks for summarization.", len(chunks))
         chunk_summaries: list[str] = []
-        for chunk in chunks:
+        for i, chunk in enumerate(chunks, 1):
+            logger.debug(
+                "Summarizing chunk %d/%d (%.1fs - %.1fs)...", i, len(chunks), chunk.start, chunk.end
+            )
             summary = provider.chat(
                 model=model,
                 system_prompt=self._prompts.chunk_system_prompt(language),
@@ -56,6 +64,7 @@ class HierarchicalSummarizer(BaseSummarizer):
             )
             chunk_summaries.append(summary.strip())
 
+        logger.info("Merging %d chunk summaries into final notes...", len(chunk_summaries))
         merged = provider.chat(
             model=model,
             system_prompt=self._prompts.merge_system_prompt(

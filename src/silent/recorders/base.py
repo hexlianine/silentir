@@ -7,8 +7,11 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from ..exceptions import TranscriptExtractionError, UnsupportedURLError
+from ..logging import get_logger
 from ..transcribers.subtitles import parse_vtt_text
 from ..types import Segment, Transcript, VideoMetadata
+
+logger = get_logger(__name__)
 
 
 class BaseRecorder(ABC):
@@ -32,6 +35,7 @@ class BaseRecorder(ABC):
             duration_sec=info.get("duration"),
             platform=self.platform,  # type: ignore[arg-type]
         )
+        logger.info("Extracted metadata for '%s' [%s]", metadata.title, self.platform)
         warnings: list[str] = []
 
         transcript = self._record_subtitle_transcript(info, language=language)
@@ -69,10 +73,12 @@ class BaseRecorder(ABC):
             opts["cookiefile"] = cookies_path
 
         try:
+            logger.info("Downloading audio from %s...", url)
             with yt_dlp.YoutubeDL(opts) as ydl:
                 ydl.download([url])
         except Exception as exc:
             temp_dir.cleanup()
+            logger.error("Failed to download audio: %s", exc)
             raise TranscriptExtractionError(f"Failed to download audio: {exc}") from exc
 
         files = [f for f in os.listdir(temp_dir.name) if f.startswith("audio.")]
@@ -135,11 +141,15 @@ class BaseRecorder(ABC):
             except Exception:
                 continue
             if segments:
+                logger.debug("Selected subtitles: language='%s', ext='%s'", lang, ext)
                 return Transcript(language=lang, source="subtitle", segments=segments)
+
+        logger.debug("No suitable subtitles found in metadata.")
         return None
 
     @staticmethod
     def _subtitle_candidates(sub_map: dict, preferred: list[str]) -> list[tuple[str, dict]]:
+        logger.debug("Finding subtitle candidates. Preferred languages: %s", preferred)
         ordered_langs: list[str] = []
         for lang in preferred:
             if lang in sub_map:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 from silent.recorders.file import FileRecorder
 
@@ -61,3 +62,29 @@ def test_download_audio_missing_file_raises():
 
     with pytest.raises(FileNotFoundError):
         recorder.download_audio("/tmp/does_not_exist_12345.mp4")
+
+
+def test_record_with_real_video():
+    # Use the sample video generated in tests/resources
+    video_path = str(Path(__file__).parent / "resources" / "sample_video.mp4")
+
+    # Ensure the file exists
+    assert os.path.exists(video_path)
+
+    recorder = FileRecorder()
+    metadata, transcript, warnings = recorder.record(video_path)
+
+    assert metadata.title == "sample_video"
+    assert metadata.platform == "local"
+    assert transcript is None
+    assert "no subtitles" in warnings[0].lower()
+
+    # Test download_audio with real file
+    audio_path, temp_dir = recorder.download_audio(video_path)
+    try:
+        assert os.path.basename(audio_path) == "sample_video.mp4"
+        assert os.path.exists(audio_path)
+        # Verify it's either a symlink or a copy
+        assert os.path.getsize(audio_path) == os.path.getsize(video_path)
+    finally:
+        temp_dir.cleanup()

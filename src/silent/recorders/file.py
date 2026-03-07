@@ -5,8 +5,12 @@ import shutil
 import tempfile
 from pathlib import Path
 
+from ..logging import get_logger
 from ..types import Transcript, VideoMetadata
 from .base import BaseRecorder
+
+logger = get_logger(__name__)
+
 
 _VIDEO_EXTENSIONS = {
     ".mp4",
@@ -55,6 +59,7 @@ class FileRecorder(BaseRecorder):
             duration_sec=None,
             platform=self.platform,
         )
+        logger.info("Local file metadata: title='%s'", metadata.title)
         warnings: list[str] = ["Local file -- no subtitles; ASR fallback will be used."]
         return metadata, None, warnings
 
@@ -66,8 +71,10 @@ class FileRecorder(BaseRecorder):
     ) -> tuple[str, tempfile.TemporaryDirectory[str]]:
         path = Path(url).resolve()
         if not path.is_file():
+            logger.error("Local file not found: %s", path)
             raise FileNotFoundError(f"Local file not found: {path}")
 
+        logger.info("Using local file as audio source: %s", path.name)
         temp_dir = tempfile.TemporaryDirectory()
         dest = os.path.join(temp_dir.name, path.name)
         # Symlink to avoid copying large files; fall back to copy.

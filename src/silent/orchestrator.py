@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .exceptions import ConfigurationError, ModelInferenceError
+from .logging import get_logger
 from .models.base import ChatProvider, ProviderUnavailable
 from .models.ollama_provider import OllamaProvider
 from .models.openai_compatible_provider import OpenAICompatibleProvider
@@ -12,6 +13,8 @@ from .recorders import RecorderRegistry, default_recorder_registry
 from .summarizers import BaseSummarizer, HierarchicalSummarizer
 from .transcribers import BaseTranscriber, WhisperASRTranscriber
 from .types import NoteResult, OutputFormat, ProviderPolicy, TimestampMode
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -72,7 +75,10 @@ class VideoNotesOrchestrator:
                 "At least one model must be configured: local_model or online_model."
             )
 
+        logger.info("Starting note generation for URL: %s", url)
+
         recorder = self._recorder_registry.match(url)
+        logger.debug("Matched recorder: %s", recorder.platform)
         metadata, transcript, warnings = recorder.record(
             url,
             language=language,
@@ -80,11 +86,15 @@ class VideoNotesOrchestrator:
         )
 
         if transcript is None:
+            logger.info("No subtitles found. Downloading audio for ASR...")
             audio_path, temp_dir = recorder.download_audio(url, cookies_path=cookies_path)
             try:
+                logger.info("Transcribing audio using %s...", self._transcriber.__class__.__name__)
                 transcript = self._transcriber.transcribe(audio_path, language=language)
             finally:
                 temp_dir.cleanup()
+        else:
+            logger.info("Successfully extracted subtitles in language: %s", transcript.language)
 
         effective_language = transcript.language if language in {None, "auto"} else language
 
@@ -103,6 +113,11 @@ class VideoNotesOrchestrator:
         note_markdown = ""
 
         for candidate in providers:
+            logger.debug(
+                "Attempting summarization with provider='%s', model='%s'",
+                candidate.provider.name,
+                candidate.model,
+            )
             try:
                 note_markdown = self._summarizer.summarize(
                     transcript,
@@ -113,8 +128,10 @@ class VideoNotesOrchestrator:
                 )
                 provider_used = candidate.provider.name
                 model_used = candidate.model
+                logger.info("Successfully generated notes using %s (%s)", provider_used, model_used)
                 break
             except ProviderUnavailable as exc:
+                logger.warning("Provider '%s' failed: %s", candidate.provider.name, exc)
                 warnings.append(f"Provider '{candidate.provider.name}' failed: {exc}")
                 last_err = exc
 
@@ -136,6 +153,7 @@ class VideoNotesOrchestrator:
         )
 
         if write_path:
+            logger.info("Writing notes to: %s", write_path)
             rendered = self._noter_registry.note(output_format, result)
             Path(write_path).write_text(rendered, encoding="utf-8")
 
