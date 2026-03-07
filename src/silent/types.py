@@ -27,7 +27,7 @@ class VideoMetadata:
     url: str
     title: str
     duration_sec: int | None
-    platform: Literal["youtube", "bilibili"]
+    platform: Literal["youtube", "bilibili", "local"]
 
 
 @dataclass

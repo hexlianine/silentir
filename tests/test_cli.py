@@ -17,4 +17,4 @@ def test_cli_unsupported_url_exit_code() -> None:
         env=env,
     )
     assert proc.returncode == 2
-    assert "Unsupported URL" in proc.stderr
+    assert "Unsupported source" in proc.stderr

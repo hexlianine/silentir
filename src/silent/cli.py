@@ -15,8 +15,8 @@ from .noters import default_noter_registry
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Generate structured notes from video URLs")
-    parser.add_argument("url", help="YouTube or Bilibili video URL")
+    parser = argparse.ArgumentParser(description="Generate structured notes from videos")
+    parser.add_argument("source", help="YouTube/Bilibili URL or local video file path")
     parser.add_argument("--language", default="auto", help="Target language or 'auto'")
     parser.add_argument(
         "--provider-policy",
@@ -71,7 +71,7 @@ def main() -> None:
 
     try:
         result = generate_notes(
-            args.url,
+            args.source,
             language=args.language,
             output_format=args.output_format,
             provider_policy=args.provider_policy,
