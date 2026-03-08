@@ -7,11 +7,25 @@ name = "silent"
 version = "0.1.0"
 description = "Generate structured notes from YouTube/Bilibili videos using local or online LLMs"
 readme = "README.md"
+license = { text = "MIT" }
+keywords = ["ai", "video", "notes", "summarization", "transcription", "youtube", "bilibili"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 requires-python = ">=3.10"
 authors = [{ name = "silent contributors" }]
 dependencies = [
   "yt-dlp>=2024.4.9",
 ]
+
+[project.urls]
+Homepage = "https://github.com/hexlianine/silent"
+Repository = "https://github.com/hexlianine/silent.git"
 
 [project.optional-dependencies]
 asr = [
@@ -20,6 +34,9 @@ asr = [
 ]
 ui = [
   "streamlit>=1.36.0",
+]
+examples = [
+  "openai",
 ]
 
 [project.scripts]

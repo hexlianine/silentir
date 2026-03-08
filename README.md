@@ -106,3 +106,15 @@ uv run --extra ui streamlit run examples/basic_ui.py
 
 The UI exposes the same configuration options as the CLI and lets you preview and download generated notes.
 You can also provide an optional `write path` to persist the rendered notes directly to a file.
+
+## Skill
+
+`silent` can be used as an skill.
+
+1. Ensure `silent` is installed in the agent's environment.
+2. Copy the `skills/silent` directory to your skills folder.
+3. The agent can then use the `/silent` command to process video URLs.
+
+**Skill files:**
+- `skills/silent/SKILL.md`: Manifest and metadata.
+- `skills/silent/handler.py`: Execution wrapper.
