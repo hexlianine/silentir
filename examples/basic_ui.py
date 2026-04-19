@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import os
 import re
+import sys
+from pathlib import Path
 
 from silent.api import generate_notes
 from silent.exceptions import (
@@ -17,6 +20,13 @@ def _sanitize_filename(value: str) -> str:
     return sanitized.strip("-") or "notes"
 
 
+def _env_str(key: str, default: str) -> str:
+    raw = os.environ.get(key)
+    if raw is None or not str(raw).strip():
+        return default
+    return str(raw).strip()
+
+
 def _format_duration(seconds: int | float | None) -> str:
     if seconds is None:
         return "Unknown"
@@ -29,6 +39,12 @@ def _format_duration(seconds: int | float | None) -> str:
 
 
 def render_app() -> None:
+    examples_dir = Path(__file__).resolve().parent
+    if str(examples_dir) not in sys.path:
+        sys.path.insert(0, str(examples_dir))
+    from envdot import load_dotenv_in_directories
+
+    load_dotenv_in_directories(examples_dir.parent, examples_dir)
     try:
         import streamlit as st
     except ModuleNotFoundError as exc:
@@ -51,7 +67,7 @@ def render_app() -> None:
         with col1:
             provider_policy = st.selectbox(
                 "Provider policy",
-                options=["local_first", "online_first", "local_only", "online_only"],
+                options=("local_first", "online_first", "local_only", "online_only"),
                 index=0,
             )
         with col2:
@@ -69,17 +85,31 @@ def render_app() -> None:
 
         col4, col5 = st.columns(2)
         with col4:
-            local_model = st.text_input("Local model", value="qwen2.5:7b-instruct")
-            ollama_host = st.text_input("Ollama host", value="http://localhost:11434")
+            local_model = st.text_input(
+                "Local model",
+                value=_env_str("LOCAL_MODEL", "qwen2.5:7b-instruct"),
+            )
+            ollama_host = st.text_input(
+                "Ollama host",
+                value=_env_str("OLLAMA_HOST", "http://localhost:11434"),
+            )
         with col5:
-            online_model = st.text_input("Online model", value="qwen/qwen3-235b-a22b-thinking-2507")
+            online_model = st.text_input(
+                "Online model",
+                value=_env_str("ONLINE_MODEL", "qwen/qwen3-235b-a22b-thinking-2507"),
+            )
             openai_base_url = st.text_input(
-                "OpenAI-compatible base URL", value="https://openrouter.ai/api/v1"
+                "OpenAI-compatible base URL",
+                value=_env_str("OPENAI_BASE_URL", "https://openrouter.ai/api/v1"),
             )
 
         col6, col7 = st.columns(2)
         with col6:
-            openai_api_key = st.text_input("OpenAI API key", type="password")
+            openai_api_key = st.text_input(
+                "OpenAI API key",
+                type="password",
+                value=_env_str("OPENAI_API_KEY", ""),
+            )
             write_path = st.text_input("Write path (optional)", value="")
         with col7:
             cookies_path = st.text_input("Cookies path (optional)", value="")
