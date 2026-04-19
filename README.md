@@ -101,7 +101,7 @@ All runtime configuration is explicit. Use CLI flags or Python function argument
 Run the web UI:
 
 ```bash
-uv run --extra ui streamlit run examples/basic_ui.py
+uv run --extra ui,asr streamlit run examples/basic_ui.py
 ```
 
 The UI exposes the same configuration options as the CLI and lets you preview and download generated notes.
