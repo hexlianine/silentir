@@ -1,12 +1,12 @@
-# silent Architecture and Video-to-Note Flow
+# silentir Architecture and Video-to-Note Flow
 
 ## Scope
 
-This document describes how `silent` turns a video URL into structured notes, the main module boundaries, and where fallback/retry logic lives.
+This document describes how `silentir` turns a video URL into structured notes, the main module boundaries, and where fallback/retry logic lives.
 
 ## High-Level Architecture
 
-`silent` is organized as a pipeline orchestrated by `VideoNotesOrchestrator`:
+`silentir` is organized as a pipeline orchestrated by `VideoNotesOrchestrator`:
 
 1. Input/API layer
 2. Recording (metadata + subtitle transcript attempt)
@@ -16,9 +16,9 @@ This document describes how `silent` turns a video URL into structured notes, th
 
 Core entrypoints:
 
-- Python API: `src/silent/api.py` (`generate_notes`)
-- CLI: `src/silent/cli.py` (`silent ...`)
-- Orchestrator: `src/silent/orchestrator.py` (`VideoNotesOrchestrator.generate`)
+- Python API: `src/silentir/api.py` (`generate_notes`)
+- CLI: `src/silentir/cli.py` (`silentir ...`)
+- Orchestrator: `src/silentir/orchestrator.py` (`VideoNotesOrchestrator.generate`)
 
 ```mermaid
 flowchart LR
@@ -41,13 +41,13 @@ flowchart LR
 
 ### Configuration
 
-- File: `src/silent/orchestrator.py`
+- File: `src/silentir/orchestrator.py`
 - Orchestrator validates explicit provider settings passed from API/CLI arguments.
-- Logging config is provided explicitly via `configure_logging(...)` in `src/silent/logging.py`.
+- Logging config is provided explicitly via `configure_logging(...)` in `src/silentir/logging.py`.
 
 ### URL Recording and Transcript Acquisition
 
-- Files: `src/silent/recorders/*`
+- Files: `src/silentir/recorders/*`
 - `RecorderRegistry.match(url)` selects a recorder by domain:
   - `YouTubeRecorder` for YouTube URLs
   - `BilibiliRecorder` for Bilibili URLs
@@ -63,7 +63,7 @@ flowchart LR
 
 ### Transcription
 
-- Files: `src/silent/transcribers/*`
+- Files: `src/silentir/transcribers/*`
 - Default transcriber: `WhisperASRTranscriber`
 - Runtime fallback order inside ASR:
   1. `faster-whisper`
@@ -72,7 +72,7 @@ flowchart LR
 
 ### Summarization
 
-- Files: `src/silent/summarizers/*`
+- Files: `src/silentir/summarizers/*`
 - Default summarizer: `HierarchicalSummarizer`
 - Two-stage process:
   1. Chunk transcript via `TranscriptChunker`
@@ -82,7 +82,7 @@ flowchart LR
 
 ### Model Providers
 
-- Files: `src/silent/models/*`
+- Files: `src/silentir/models/*`
 - Shared provider interface: `ChatProvider.chat(...)`
 - Concrete providers:
   - `OllamaProvider` (`local`)
@@ -96,7 +96,7 @@ flowchart LR
 
 ### Output Rendering
 
-- Files: `src/silent/noters/*`
+- Files: `src/silentir/noters/*`
 - `NoterRegistry` maps output format to renderer:
   - `markdown` -> `MarkdownNoter`
   - `text` -> `TextNoter`
@@ -106,7 +106,7 @@ flowchart LR
 
 ## Data Model
 
-Main shared dataclasses are in `src/silent/types.py`:
+Main shared dataclasses are in `src/silentir/types.py`:
 
 - `Segment`: `(start, end, text)`
 - `Transcript`: `(language, source, segments)`

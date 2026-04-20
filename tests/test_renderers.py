@@ -1,5 +1,5 @@
-from silent.noters.markdown import MarkdownNoter
-from silent.types import NoteResult
+from silentir.noters.markdown import MarkdownNoter
+from silentir.types import NoteResult
 
 
 def test_markdown_renderer_appends_newline() -> None:

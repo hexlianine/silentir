@@ -1,4 +1,4 @@
-from silent.orchestrator import provider_order
+from silentir.orchestrator import provider_order
 
 
 def test_provider_order_local_first() -> None:

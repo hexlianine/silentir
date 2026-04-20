@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from silent.api import generate_notes
-from silent.exceptions import ConfigurationError
+from silentir.api import generate_notes
+from silentir.exceptions import ConfigurationError
 
 
 def test_generate_notes_requires_at_least_one_model() -> None:

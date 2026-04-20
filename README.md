@@ -1,6 +1,6 @@
-# silent
+# silentir
 
-The `silent` project generates structured notes from YouTube and Bilibili URLs using local (`Ollama`) or online (`OpenAI-compatible`) models.
+The `silentir` project generates structured notes from YouTube and Bilibili URLs using local (`Ollama`) or online (`OpenAI-compatible`) models.
 
 ## Install
 
@@ -35,7 +35,7 @@ uv sync --group dev
 ## Quickstart
 
 ```bash
-uv run silent "https://www.youtube.com/watch?v=dQw4w9WgXcQ" \
+uv run silentir "https://www.youtube.com/watch?v=dQw4w9WgXcQ" \
   --provider-policy local_first \
   --output-format markdown \
   --include-timestamps section \
@@ -45,7 +45,7 @@ uv run silent "https://www.youtube.com/watch?v=dQw4w9WgXcQ" \
 ## Python API
 
 ```python
-from silent import generate_notes
+from silentir import generate_notes
 
 result = generate_notes(
     "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
@@ -109,12 +109,12 @@ You can also provide an optional `write path` to persist the rendered notes dire
 
 ## Skill
 
-`silent` can be used as an skill.
+`silentir` can be used as an skill.
 
-1. Ensure `silent` is installed in the agent's environment.
-2. Copy the `skills/silent` directory to your skills folder.
-3. The agent can then use the `/silent` command to process video URLs.
+1. Ensure `silentir` is installed in the agent's environment.
+2. Copy the `skills/silentir` directory to your skills folder.
+3. The agent can then use the `/silentir` command to process video URLs.
 
 **Skill files:**
-- `skills/silent/SKILL.md`: Manifest and metadata.
-- `skills/silent/handler.py`: Execution wrapper.
+- `skills/silentir/SKILL.md`: Manifest and metadata.
+- `skills/silentir/handler.py`: Execution wrapper.

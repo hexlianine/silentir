@@ -1,8 +1,8 @@
 """
-Logging configuration for the silent package.
+Logging configuration for the silentir package.
 
 This module provides a centralized logging setup following Python best practices:
-- Hierarchical logger names (silent.*)
+- Hierarchical logger names (silentir.*)
 - Explicit logging configuration from function inputs
 - Structured formatting with timestamps, levels, and module names
 - Support for both console and file logging
@@ -23,7 +23,7 @@ DEFAULT_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 DEFAULT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 # Package logger name
-PACKAGE_LOGGER_NAME = "silent"
+PACKAGE_LOGGER_NAME = "silentir"
 
 
 @dataclass
@@ -78,14 +78,14 @@ def _get_log_level(settings: LoggingSettings) -> int:
 
 def setup_logger(settings: LoggingSettings) -> None:
     """
-    Configure logging for the ``silent`` package if needed.
+    Configure logging for the ``silentir`` package if needed.
 
     Behavior:
     - If application-level logging is already configured (i.e. the root logger
       has handlers), the package will not modify global logging configuration
       and will only attach a ``NullHandler`` to avoid "No handlers could be
       found" warnings.
-    - If logging is not yet configured, ``silent`` sets up its own console and
+    - If logging is not yet configured, ``silentir`` sets up its own console and
       optional file handlers based on explicit settings.
     """
     logger = logging.getLogger(PACKAGE_LOGGER_NAME)
@@ -140,7 +140,7 @@ def get_logger(name: str | None = None) -> logging.Logger:
     Get a logger instance for a module.
 
     This function follows the best practice of using module names as logger names.
-    The logger name will be 'silent.module_name' for better organization.
+    The logger name will be 'silentir.module_name' for better organization.
 
     Args:
         name: Name of the logger. If None, uses the calling module's name.
@@ -151,12 +151,12 @@ def get_logger(name: str | None = None) -> logging.Logger:
 
     Examples:
         >>> # In a module file (e.g., orchestrator.py)
-        >>> from silent.logging import get_logger
+        >>> from silentir.logging import get_logger
         >>> logger = get_logger(__name__)
         >>> logger.info("Processing video...")
 
         >>> # Or with explicit name
-        >>> logger = get_logger("silent.orchestrator")
+        >>> logger = get_logger("silentir.orchestrator")
     """
     if name is None:
         # Try to get the calling module's name
@@ -176,7 +176,7 @@ def get_logger(name: str | None = None) -> logging.Logger:
 
 def set_log_level(level: LogLevel | int) -> None:
     """
-    Set the log level for all silent loggers.
+    Set the log level for all silentir loggers.
 
     Args:
         level: Log level as string ("DEBUG", "INFO", etc.) or logging constant

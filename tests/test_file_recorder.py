@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from silent.recorders.file import FileRecorder
+from silentir.recorders.file import FileRecorder
 
 
 def test_supports_existing_file(tmp_path):

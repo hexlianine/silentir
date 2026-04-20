@@ -3,12 +3,12 @@ import argparse
 import os
 import sys
 
-from silent import generate_notes
-from silent.logging import LoggingSettings, setup_logger
+from silentir import generate_notes
+from silentir.logging import LoggingSettings, setup_logger
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Silent Skill Handler")
+    parser = argparse.ArgumentParser(description="Silentir Skill Handler")
     parser.add_argument("url", help="URL of the video to process")
     parser.add_argument("--language", default="auto", help="Language for notes")
     parser.add_argument("--local-model", help="Local Ollama model name")

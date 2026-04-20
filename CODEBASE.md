@@ -1,8 +1,8 @@
-# Silent
+# Silentir
 
 ## Overview
 
-Silent is a Python package that generates structured markdown notes from YouTube and Bilibili videos using local (Ollama) or online (OpenAI-compatible) large language models. It prioritizes subtitle extraction with automatic speech recognition (ASR) fallback when subtitles are unavailable, and supports configurable provider fallback policies for model inference.
+Silentir is a Python package that generates structured markdown notes from YouTube and Bilibili videos using local (Ollama) or online (OpenAI-compatible) large language models. It prioritizes subtitle extraction with automatic speech recognition (ASR) fallback when subtitles are unavailable, and supports configurable provider fallback policies for model inference.
 
 ## Quick Start
 
@@ -23,7 +23,7 @@ uv sync --group dev      # Development/test dependencies
 ### Usage (CLI)
 
 ```bash
-uv run silent "https://www.youtube.com/watch?v=dQw4w9WgXcQ" \
+uv run silentir "https://www.youtube.com/watch?v=dQw4w9WgXcQ" \
   --provider-policy local_first \
   --output-format markdown \
   --include-timestamps section \
@@ -33,7 +33,7 @@ uv run silent "https://www.youtube.com/watch?v=dQw4w9WgXcQ" \
 ### Usage (Python API)
 
 ```python
-from silent import generate_notes
+from silentir import generate_notes
 
 result = generate_notes(
     "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
@@ -62,7 +62,7 @@ uv run pytest
 
 ## Architecture
 
-Silent follows a **pipeline architecture** with clear separation of concerns. The entire process is orchestrated by `VideoNotesOrchestrator` which coordinates the following stages:
+Silentir follows a **pipeline architecture** with clear separation of concerns. The entire process is orchestrated by `VideoNotesOrchestrator` which coordinates the following stages:
 
 ```mermaid
 flowchart LR
@@ -85,22 +85,22 @@ flowchart LR
 
 | Component | Location | Purpose and Responsibility |
 |-----------|----------|-----------------------------|
-| **VideoNotesOrchestrator** | [`src/silent/orchestrator.py`](src/silent/orchestrator.py) | Main pipeline coordinator. Validates configuration, manages fallback strategies, delegates to specialized components. |
-| **API Entry Point** | [`src/silent/api.py`](src/silent/api.py) | Public Python API (`generate_notes` function) for programmatic use. |
-| **CLI Entry Point** | [`src/silent/cli.py`](src/silent/cli.py) | Command-line interface with argparse argument parsing. Installed as `silent` console script. |
-| **Recorders** | [`src/silent/recorders/`](src/silent/recorders/) | Extract video metadata and subtitles from URLs. Supports YouTube, Bilibili, and local video files. |
-| **Transcribers** | [`src/silent/transcribers/`](src/silent/transcribers/) | ASR transcription when subtitles are unavailable. Uses faster-whisper with openai-whisper fallback. |
-| **Models** | [`src/silent/models/`](src/silent/models/) | Abstract chat provider interface with implementations for Ollama (local) and OpenAI-compatible (online) models. |
-| **Summarizers** | [`src/silent/summarizers/`](src/silent/summarizers/) | Hierarchical summarization: chunks transcript, summarizes each chunk, then merges into final notes. |
-| **Noters** | [`src/silent/noters/`](src/silent/noters/) | Output rendering in multiple formats (markdown, plain text, JSON). |
-| **Types** | [`src/silent/types.py`](src/silent/types.py) | Shared dataclasses for segments, transcripts, metadata, and results. |
-| **Exceptions** | [`src/silent/exceptions.py`](src/silent/exceptions.py) | Custom exception types for error handling. |
+| **VideoNotesOrchestrator** | [`src/silentir/orchestrator.py`](src/silentir/orchestrator.py) | Main pipeline coordinator. Validates configuration, manages fallback strategies, delegates to specialized components. |
+| **API Entry Point** | [`src/silentir/api.py`](src/silentir/api.py) | Public Python API (`generate_notes` function) for programmatic use. |
+| **CLI Entry Point** | [`src/silentir/cli.py`](src/silentir/cli.py) | Command-line interface with argparse argument parsing. Installed as `silentir` console script. |
+| **Recorders** | [`src/silentir/recorders/`](src/silentir/recorders/) | Extract video metadata and subtitles from URLs. Supports YouTube, Bilibili, and local video files. |
+| **Transcribers** | [`src/silentir/transcribers/`](src/silentir/transcribers/) | ASR transcription when subtitles are unavailable. Uses faster-whisper with openai-whisper fallback. |
+| **Models** | [`src/silentir/models/`](src/silentir/models/) | Abstract chat provider interface with implementations for Ollama (local) and OpenAI-compatible (online) models. |
+| **Summarizers** | [`src/silentir/summarizers/`](src/silentir/summarizers/) | Hierarchical summarization: chunks transcript, summarizes each chunk, then merges into final notes. |
+| **Noters** | [`src/silentir/noters/`](src/silentir/noters/) | Output rendering in multiple formats (markdown, plain text, JSON). |
+| **Types** | [`src/silentir/types.py`](src/silentir/types.py) | Shared dataclasses for segments, transcripts, metadata, and results. |
+| **Exceptions** | [`src/silentir/exceptions.py`](src/silentir/exceptions.py) | Custom exception types for error handling. |
 
 ## Key Concepts
 
 ### Fallback Ladder
 
-Silent uses a multi-level fallback strategy:
+Silentir uses a multi-level fallback strategy:
 
 1. **Transcript source**: Subtitles → ASR transcription
 2. **ASR backend**: faster-whisper → openai-whisper
@@ -129,8 +129,8 @@ Control how timestamps are included in the generated notes:
 ## Directory Structure
 
 ```
-silent/
-├── src/silent/                    # Main package
+silentir/
+├── src/silentir/                    # Main package
 │   ├── __init__.py               # Package exports (generate_notes, NoteResult)
 │   ├── api.py                    # Public Python API
 │   ├── cli.py                    # CLI entry point
@@ -176,7 +176,7 @@ silent/
 ├── docs/
 │   └── architecture.md           # Detailed architecture documentation
 ├── skills/
-│   └── silent/                   # Claude Code skill integration
+│   └── silentir/                   # Claude Code skill integration
 │       ├── SKILL.md              # Skill manifest
 │       └── handler.py            # Skill entry point
 ├── .github/workflows/
@@ -279,7 +279,7 @@ All configuration is **explicit** - no implicit configuration from environment v
 
 ## Extension Points
 
-Silent is designed for extensibility:
+Silentir is designed for extensibility:
 
 - **New video platform**: Implement `BaseRecorder` and register in `RecorderRegistry`
 - **New ASR engine**: Implement `BaseTranscriber` and inject into `VideoNotesOrchestrator`

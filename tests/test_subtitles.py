@@ -1,4 +1,4 @@
-from silent.transcribers.subtitles import parse_vtt_text
+from silentir.transcribers.subtitles import parse_vtt_text
 
 
 def test_parse_vtt_text_basic() -> None:

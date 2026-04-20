@@ -1,5 +1,5 @@
-from silent.summarizers.chunker import TranscriptChunker
-from silent.types import Segment, Transcript
+from silentir.summarizers.chunker import TranscriptChunker
+from silentir.types import Segment, Transcript
 
 
 def test_chunk_transcript_splits_large_input() -> None:

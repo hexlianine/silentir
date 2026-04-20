@@ -11,7 +11,7 @@ def test_cli_unsupported_url_exit_code() -> None:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(root / "src")
     proc = subprocess.run(
-        [sys.executable, "-m", "silent.cli", "https://example.com/video"],
+        [sys.executable, "-m", "silentir.cli", "https://example.com/video"],
         capture_output=True,
         text=True,
         env=env,

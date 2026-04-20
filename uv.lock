@@ -2133,8 +2133,8 @@ wheels = [
 ]
 
 [[package]]
-name = "silent"
-version = "0.1.0"
+name = "silentir"
+version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "yt-dlp" },

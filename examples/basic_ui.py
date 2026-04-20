@@ -5,14 +5,14 @@ import re
 import sys
 from pathlib import Path
 
-from silent.api import generate_notes
-from silent.exceptions import (
+from silentir.api import generate_notes
+from silentir.exceptions import (
     ConfigurationError,
     ModelInferenceError,
     TranscriptExtractionError,
     UnsupportedURLError,
 )
-from silent.noters import default_noter_registry
+from silentir.noters import default_noter_registry
 
 
 def _sanitize_filename(value: str) -> str:
@@ -50,8 +50,8 @@ def render_app() -> None:
     except ModuleNotFoundError as exc:
         raise SystemExit("Streamlit is not installed. Run: uv sync --extra ui") from exc
 
-    st.set_page_config(page_title="Silent UI", page_icon="M", layout="wide")
-    st.title("Silent")
+    st.set_page_config(page_title="Silentir UI", page_icon="M", layout="wide")
+    st.title("Silentir")
     st.caption("Generate structured notes from YouTube and Bilibili URLs.")
 
     if "rendered_note" not in st.session_state:

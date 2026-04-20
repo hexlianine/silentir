@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from silent.logging import get_logger
+from silentir.logging import get_logger
 
 from .exceptions import ConfigurationError
 from .orchestrator import VideoNotesOrchestrator

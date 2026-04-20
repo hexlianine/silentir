@@ -1,14 +1,14 @@
 ---
-name: silent
+name: silentir
 description: Generate structured notes and summaries from YouTube or Bilibili video URLs. It can handle both online and local models for transcription and summarization.
 user-invocable: true
 metadata:
   {"requires": {"bins": ["python3"]}}
 ---
 
-# Silent Video Notes
+# Silentir Video Notes
 
-The `silent` skill allows the agent to generate high-quality, structured notes from video URLs (YouTube/Bilibili).
+The `silentir` skill allows the agent to generate high-quality, structured notes from video URLs (YouTube/Bilibili).
 
 ## How to use
 
@@ -21,4 +21,4 @@ Invoke this skill when the user provides a video link and wants a summary, key t
 - `online_model`: optional, OpenAI-compatible model name.
 
 ## Example
-`/silent url="https://www.youtube.com/watch?v=..."`
+`/silentir url="https://www.youtube.com/watch?v=..."`
