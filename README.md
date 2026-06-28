@@ -109,12 +109,33 @@ You can also provide an optional `write path` to persist the rendered notes dire
 
 ## Skill
 
-`silentir` can be used as an skill.
+`silentir` ships an agent skill so Claude Code (and other runtimes that read `~/.agents/skills/`) can call it via a slash command.
 
-1. Ensure `silentir` is installed in the agent's environment.
-2. Copy the `skills/silentir` directory to your skills folder.
-3. The agent can then use the `/silentir` command to process video URLs.
+### Quick install
+
+```bash
+# Install as `/silentir` (default)
+bash scripts/install-skill.sh
+
+# Install under a custom slash-command name
+bash scripts/install-skill.sh --name video-notes
+# -> /video-notes source="<URL or local file path>"
+
+# Development mode: symlink instead of copy
+bash scripts/install-skill.sh --symlink
+
+# Remove an install
+bash scripts/install-skill.sh --uninstall --name video-notes
+```
+
+The script copies (or symlinks) the skill into `~/.agents/skills/<name>/` and creates a `~/.claude/skills/<name>` symlink. The installed `SKILL.md`'s `name:` field is rewritten when you pass `--name` so the slash command matches. `bash scripts/install-skill.sh --help` lists every flag. Override `AGENTS_SKILLS_DIR` / `CLAUDE_SKILLS_DIR` env vars to target a non-default location.
+
+### Requirements
+
+- `uvx` on `$PATH` ([install uv](https://docs.astral.sh/uv/getting-started/installation/)). The handler launches the published `silentir[asr]` package from PyPI; no local checkout is needed.
+- Optional env defaults: `LOCAL_MODEL`, `ONLINE_MODEL`, `OPENAI_BASE_URL`, `OPENAI_API_KEY`.
 
 **Skill files:**
-- `skills/silentir/SKILL.md`: Manifest and metadata.
-- `skills/silentir/handler.py`: Execution wrapper.
+- [skills/silentir/SKILL.md](skills/silentir/SKILL.md): manifest, description, and argument doc.
+- [skills/silentir/handler.py](skills/silentir/handler.py): execution wrapper (shells out to `uvx --from "silentir[asr]" silentir …`).
+- [scripts/install-skill.sh](scripts/install-skill.sh): install / uninstall utility (kept outside the skill payload).
