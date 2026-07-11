@@ -103,8 +103,9 @@ flowchart LR
 Silentir uses a multi-level fallback strategy:
 
 1. **Transcript source**: Subtitles → ASR transcription
-2. **ASR backend**: faster-whisper → openai-whisper
-3. **LLM provider**: Follows configured `provider_policy`: `local_first`, `online_first`, `local_only`, or `online_only`
+2. **Bilibili subtitle backend** (Bilibili URLs only): `bilibili-cli` (`bili`) → `yt-dlp`, controlled by `--bilibili-backend` (`auto` / `bili` / `ytdlp`)
+3. **ASR backend**: faster-whisper → openai-whisper
+4. **LLM provider**: Follows configured `provider_policy`: `local_first`, `online_first`, `local_only`, or `online_only`
 
 ### Provider Policies
 
@@ -145,7 +146,7 @@ silentir/
 │   ├── recorders/                # Video metadata/transcript extractors
 │   │   ├── base.py               # Base Recorder interface
 │   │   ├── youtube.py            # YouTube recorder
-│   │   ├── bilibili.py           # Bilibili recorder
+│   │   ├── bilibili.py           # Bilibili recorder (bili -> yt-dlp fallback)
 │   │   └── file.py               # Local video file recorder
 │   ├── transcribers/             # ASR transcription
 │   │   ├── base.py               # Base Transcriber interface
@@ -166,6 +167,7 @@ silentir/
 │   ├── test_chunker.py           # Chunking tests
 │   ├── test_cli.py               # CLI tests
 │   ├── test_file_recorder.py     # File recorder tests
+│   ├── test_bilibili_recorder.py # Bilibili recorder tests (bili backend + fallback)
 │   ├── test_model_config_validation.py
 │   ├── test_orchestrator_policy.py
 │   ├── test_renderers.py         # Output rendering tests

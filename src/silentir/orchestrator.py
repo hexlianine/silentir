@@ -40,11 +40,16 @@ class VideoNotesOrchestrator:
         self,
         *,
         recorder_registry: RecorderRegistry | None = None,
+        bilibili_backend: str = "auto",
         transcriber: BaseTranscriber | None = None,
         summarizer: BaseSummarizer | None = None,
         noter_registry: NoterRegistry | None = None,
     ) -> None:
-        self._recorder_registry = recorder_registry or default_recorder_registry()
+        self._recorder_registry = (
+            recorder_registry
+            if recorder_registry is not None
+            else default_recorder_registry(bilibili_backend=bilibili_backend)
+        )
         self._transcriber = transcriber or WhisperASRTranscriber()
         self._summarizer = summarizer or HierarchicalSummarizer()
         self._noter_registry = noter_registry or default_noter_registry()

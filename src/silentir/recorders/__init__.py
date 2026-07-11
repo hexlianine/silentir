@@ -4,8 +4,14 @@ from .file import FileRecorder
 from .youtube import YouTubeRecorder
 
 
-def default_recorder_registry() -> RecorderRegistry:
-    return RecorderRegistry([YouTubeRecorder(), BilibiliRecorder(), FileRecorder()])
+def default_recorder_registry(*, bilibili_backend: str = "auto") -> RecorderRegistry:
+    return RecorderRegistry(
+        [
+            YouTubeRecorder(),
+            BilibiliRecorder(backend=bilibili_backend),
+            FileRecorder(),
+        ]
+    )
 
 
 __all__ = [

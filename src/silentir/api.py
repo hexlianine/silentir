@@ -21,13 +21,14 @@ def generate_notes(
     include_timestamps: TimestampMode = "section",
     write_path: str | None = None,
     cookies_path: str | None = None,
+    bilibili_backend: str = "auto",
 ) -> NoteResult:
     logger = get_logger()
     logger.debug(
         "Generating notes with parameters: "
         "url=%r, language=%r, output_format=%r, provider_policy=%r, local_model=%r, "
         "online_model=%r, ollama_host=%r, openai_base_url=%r, include_timestamps=%r, "
-        "write_path=%r, cookies_path=%r",
+        "write_path=%r, cookies_path=%r, bilibili_backend=%r",
         url,
         language,
         output_format,
@@ -39,6 +40,7 @@ def generate_notes(
         include_timestamps,
         write_path,
         cookies_path,
+        bilibili_backend,
     )
 
     if local_model is None and online_model is None:
@@ -46,7 +48,7 @@ def generate_notes(
             "At least one model must be configured: local_model or online_model."
         )
 
-    orchestrator = VideoNotesOrchestrator()
+    orchestrator = VideoNotesOrchestrator(bilibili_backend=bilibili_backend)
     return orchestrator.generate(
         url=url,
         language=language,
