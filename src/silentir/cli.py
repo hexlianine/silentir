@@ -52,6 +52,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--log-file", default=None)
     parser.add_argument("--out", dest="out", default=None, help="Optional output file path")
     parser.add_argument("--cookies", dest="cookies", default=None, help="Optional cookies.txt path")
+    parser.add_argument(
+        "--bilibili-backend",
+        dest="bilibili_backend",
+        default="auto",
+        choices=["auto", "bili", "ytdlp"],
+        help="Bilibili subtitle source: auto (bili then yt-dlp), bili, or ytdlp",
+    )
     return parser
 
 
@@ -83,6 +90,7 @@ def main() -> None:
             include_timestamps=args.include_timestamps,
             write_path=args.out,
             cookies_path=args.cookies,
+            bilibili_backend=args.bilibili_backend,
         )
     except (UnsupportedURLError, ConfigurationError) as exc:
         print(f"Error: {exc}", file=sys.stderr)

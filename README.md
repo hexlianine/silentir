@@ -96,6 +96,25 @@ All runtime configuration is explicit. Use CLI flags or Python function argument
 - If subtitles are unavailable, ASR transcriber fallback is used.
 - Runtime provider fallback follows `provider_policy`.
 
+## Bilibili Subtitles (Optional)
+
+For Bilibili URLs, subtitle extraction prefers [`bilibili-cli`](https://github.com/public-clis/bilibili-cli) (`bili`) when available, because Bilibili subtitles require authentication and use a private format that `yt-dlp` cannot reliably fetch. If `bili` is missing or fails, silentir automatically falls back to `yt-dlp`.
+
+Install and authenticate (one time):
+
+```bash
+uv tool install bilibili-cli
+bili login   # QR login, or auto-uses browser cookies
+```
+
+Control the backend explicitly with `--bilibili-backend`:
+
+- `auto` (default): try `bili`, fall back to `yt-dlp`
+- `bili`: use `bili` only; fail if unavailable
+- `ytdlp`: use `yt-dlp` only, skip `bili`
+
+`bili` uses its own credential store (`~/.bilibili-cli/`). The `--cookies` flag applies only to the `yt-dlp` fallback path.
+
 ## Streamlit UI
 
 Run the web UI:
