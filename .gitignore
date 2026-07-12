@@ -157,5 +157,8 @@ cython_debug/
 ehthumbs.db
 Thumbs.db
 
+# PyPI token file (local only, never commit)
+.pypi-token
+
 # Project specific
 *.egg-info/
