@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "silentir"
-version = "0.1.1"
+version = "0.2.0"
 description = "Generate structured notes from YouTube/Bilibili videos using local or online LLMs"
 readme = "README.md"
 license = { text = "MIT" }
