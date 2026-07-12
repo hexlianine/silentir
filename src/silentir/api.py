@@ -22,13 +22,14 @@ def generate_notes(
     write_path: str | None = None,
     cookies_path: str | None = None,
     bilibili_backend: str = "auto",
+    transcript_only: bool = False,
 ) -> NoteResult:
     logger = get_logger()
     logger.debug(
         "Generating notes with parameters: "
         "url=%r, language=%r, output_format=%r, provider_policy=%r, local_model=%r, "
         "online_model=%r, ollama_host=%r, openai_base_url=%r, include_timestamps=%r, "
-        "write_path=%r, cookies_path=%r, bilibili_backend=%r",
+        "write_path=%r, cookies_path=%r, bilibili_backend=%r, transcript_only=%r",
         url,
         language,
         output_format,
@@ -41,9 +42,10 @@ def generate_notes(
         write_path,
         cookies_path,
         bilibili_backend,
+        transcript_only,
     )
 
-    if local_model is None and online_model is None:
+    if not transcript_only and local_model is None and online_model is None:
         raise ConfigurationError(
             "At least one model must be configured: local_model or online_model."
         )
@@ -62,4 +64,5 @@ def generate_notes(
         include_timestamps=include_timestamps,
         write_path=write_path,
         cookies_path=cookies_path,
+        transcript_only=transcript_only,
     )

@@ -113,11 +113,17 @@ Main shared dataclasses are in `src/silentir/types.py`:
 - `VideoMetadata`: `(url, title, duration_sec, platform)`
 - `NoteResult`: final generated note + runtime metadata and warnings
 
+## Transcript-Only Mode
+
+When `--transcript-only` is set (or `transcript_only=True` via the API), the orchestrator short-circuits after step 7 below — it formats the transcript as `[HH:MM:SS] segment text` per line and returns it as `NoteResult.note_markdown` without any LLM summarization. No model configuration (local/online) is required in this mode.
+
+This mode is used by the skill handler when it auto-detects it is running inside a CLI coding agent (see [Skill Auto-Detection](#skill-auto-detection)).
+
 ## End-to-End Video-to-Note Flow
 
 1. Caller invokes `generate_notes(...)` (API) or CLI.
 2. API creates `VideoNotesOrchestrator` and calls `generate(...)`.
-3. Orchestrator validates and uses explicit settings passed by caller.
+3. Orchestrator validates settings (model validation skipped when `transcript_only=True`).
 4. Recorder is selected from `RecorderRegistry` based on URL host.
 5. Recorder extracts metadata and tries subtitle transcript.
 6. If no subtitles:
@@ -125,14 +131,15 @@ Main shared dataclasses are in `src/silentir/types.py`:
    - Transcriber runs ASR and returns transcript.
    - Temp files are cleaned up in `finally`.
 7. Orchestrator resolves effective language (`auto`/`None` uses transcript-detected language).
-8. Orchestrator builds provider candidates from policy and configured models.
-9. Summarizer runs against provider candidates in order:
-   - Chunk-level summaries
-   - Merge pass into final Markdown notes
-10. On provider failure, warning is recorded and next provider is attempted.
-11. On success, `NoteResult` is assembled.
-12. If output path is requested, selected noter renders and writes output.
-13. `NoteResult` is returned; CLI additionally prints selected format.
+8. **If `transcript_only=True`**: format transcript text and return `NoteResult` immediately — skip remaining steps.
+9. Orchestrator builds provider candidates from policy and configured models.
+10. Summarizer runs against provider candidates in order:
+    - Chunk-level summaries
+    - Merge pass into final Markdown notes
+11. On provider failure, warning is recorded and next provider is attempted.
+12. On success, `NoteResult` is assembled.
+13. If output path is requested, selected noter renders and writes output.
+14. `NoteResult` is returned; CLI additionally prints selected format.
 
 ```mermaid
 flowchart TD
@@ -171,6 +178,14 @@ Fallback ladders:
 1. Transcript source: subtitles -> ASR
 2. ASR backend: faster-whisper -> openai-whisper
 3. LLM provider: according to `provider_policy` order
+
+## Skill Auto-Detection
+
+The skill handler at `skills/silentir/handler.py` auto-detects whether it is running inside a CLI coding agent (Claude Code, Codex, OpenCode) by checking inherited environment variables (`CLAUDECODE=1`, `CODEX_*` prefix, `OPENCODE`).
+
+When detected, the handler switches to **transcript-only mode**: it runs the silentir CLI with `--transcript-only`, outputting the raw transcript. The calling agent (per `SKILL.md` instructions) then generates structured notes using its own LLM, avoiding a subprocess-based agent pipeline.
+
+When no agent is detected, the handler runs the full provider pipeline via uvx (existing behavior).
 
 ## Extension Points
 

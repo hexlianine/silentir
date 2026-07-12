@@ -33,6 +33,11 @@ def build_parser() -> argparse.ArgumentParser:
         default="section",
         choices=["section", "point", "none"],
     )
+    parser.add_argument(
+        "--transcript-only",
+        action="store_true",
+        help="Extract transcript only, skip LLM summarization",
+    )
     parser.add_argument("--local-model", default="qwen2.5:7b-instruct")
     parser.add_argument("--online-model", default="gpt-4.1-mini")
     parser.add_argument("--ollama-host", default="http://localhost:11434")
@@ -91,6 +96,7 @@ def main() -> None:
             write_path=args.out,
             cookies_path=args.cookies,
             bilibili_backend=args.bilibili_backend,
+            transcript_only=args.transcript_only,
         )
     except (UnsupportedURLError, ConfigurationError) as exc:
         print(f"Error: {exc}", file=sys.stderr)

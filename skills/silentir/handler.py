@@ -409,6 +409,29 @@ def _extract_error_line(stderr: str) -> str | None:
 
 
 # ---------------------------------------------------------------------------
+# Agent context auto-detection
+# ---------------------------------------------------------------------------
+
+
+def _detect_agent() -> str | None:
+    """Auto-detect if running inside a CLI coding agent via env vars.
+
+    Returns the agent name (``"claude_code"``, ``"codex"``, ``"opencode"``)
+    or *None* when no known agent is detected.
+    """
+    # Claude Code — the canonical env var set in all subprocesses.
+    if os.environ.get("CLAUDECODE") == "1":
+        return "claude_code"
+    # OpenAI Codex CLI
+    if any(k.startswith("CODEX_") for k in os.environ):
+        return "codex"
+    # OpenCode
+    if os.environ.get("OPENCODE") is not None:
+        return "opencode"
+    return None
+
+
+# ---------------------------------------------------------------------------
 # uvx command construction
 # ---------------------------------------------------------------------------
 
@@ -457,6 +480,33 @@ def build_uvx_cmd(args: argparse.Namespace) -> list[str]:
     return cmd
 
 
+def build_transcript_cmd(args: argparse.Namespace) -> list[str]:
+    """Build uvx command for transcript-only extraction (no LLM summarization).
+
+    This is used when the handler detects it is running inside a CLI agent
+    (Claude Code, Codex, OpenCode) — the calling agent handles LLM work.
+    """
+    spec = SILENTIR_SPEC
+    if args.silentir_version:
+        spec = f"silentir[asr]=={args.silentir_version}"
+
+    cmd: list[str] = [
+        "uvx",
+        "--from",
+        spec,
+        "silentir",
+        args.source,
+        "--transcript-only",
+        "--language",
+        args.language,
+    ]
+    if args.cookies:
+        cmd.extend(["--cookies", args.cookies])
+    if args.verbose:
+        cmd.append("--verbose")
+    return cmd
+
+
 # ---------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------
@@ -489,7 +539,11 @@ def main(argv: list[str] | None = None) -> int:
         emit_failure(pre)
         return pre.exit_code
 
-    cmd = build_uvx_cmd(args)
+    agent = _detect_agent()
+    if agent:
+        cmd = build_transcript_cmd(args)
+    else:
+        cmd = build_uvx_cmd(args)
     try:
         proc = subprocess.run(cmd, stderr=subprocess.PIPE, text=True, check=False)
     except FileNotFoundError as exc:

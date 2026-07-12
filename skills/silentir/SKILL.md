@@ -60,6 +60,31 @@ When the underlying pipeline fails, the handler emits a structured remediation b
 
 A subset of failures is caught **before** `uvx` is invoked (missing local file, missing cookies file, `online_only` policy with no API key, `local_only` policy with no model). These also produce the same remediation block format, so the agent can use a single parsing path.
 
+## Agent context (auto-detection)
+
+When this skill detects it is running inside a CLI coding agent (Claude Code, Codex, or OpenCode) — via inherited environment variables — it automatically switches to **transcript-only mode**: it extracts the video transcript and returns it to the current agent for LLM summarization, rather than running a full provider pipeline.
+
+The transcript output will start with:
+
+```
+--- transcript ---
+title: <video title>
+url: <source URL>
+duration: <duration in seconds>
+language: <language>
+
+[HH:MM:SS] <segment text>
+[HH:MM:SS] <next segment>
+```
+
+**When you see transcript-formatted output, YOUR TASK is to use your own LLM to generate structured, high-quality Markdown notes**, including:
+- A title and summary of the video
+- Key points organized by logical section
+- Important quotes, code snippets, or technical details
+- Timestamped references where relevant
+
+If the result is unsatisfactory, re-invoke `/silentir` with explicit provider settings (see [Invocation examples](#invocation-examples)) to force the full pipeline instead.
+
 ## Invocation examples
 
 ```bash

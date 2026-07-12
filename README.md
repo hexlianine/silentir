@@ -42,6 +42,16 @@ uv run silentir "https://www.youtube.com/watch?v=dQw4w9WgXcQ" \
   --out notes.md
 ```
 
+### Transcript-only mode
+
+Extract the raw video transcript without LLM summarization:
+
+```bash
+uv run silentir "https://www.youtube.com/watch?v=dQw4w9WgXcQ" --transcript-only
+```
+
+Output format: `[HH:MM:SS] segment text` per line, one segment per line. No model configuration is needed in this mode — it skips the entire provider pipeline.
+
 ## Python API
 
 ```python
@@ -58,6 +68,13 @@ result = generate_notes(
     openai_api_key=None,
 )
 print(result.note_markdown)
+
+# Transcript-only (no model needed):
+transcript = generate_notes(
+    "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    transcript_only=True,
+)
+print(transcript.note_markdown)  # [HH:MM:SS] segment text
 ```
 
 Run tests:
@@ -129,6 +146,8 @@ You can also provide an optional `write path` to persist the rendered notes dire
 ## Skill
 
 `silentir` ships an agent skill so Claude Code (and other runtimes that read `~/.agents/skills/`) can call it via a slash command.
+
+**Auto-detection:** When invoked from inside a CLI coding agent (Claude Code, Codex, OpenCode), the skill automatically switches to transcript-only mode and delegates LLM summarization to the calling agent. No manual `--agent` flag is required — detection is via inherited environment variables (`CLAUDECODE`, `CODEX_*`, `OPENCODE`).
 
 ### Quick install
 

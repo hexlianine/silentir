@@ -69,16 +69,18 @@ class VideoNotesOrchestrator:
         include_timestamps: TimestampMode,
         write_path: str | None,
         cookies_path: str | None,
+        transcript_only: bool = False,
     ) -> NoteResult:
-        allowed = {"local_first", "online_first", "local_only", "online_only"}
-        if provider_policy not in allowed:
-            raise ConfigurationError(
-                f"Invalid provider policy '{provider_policy}'. Allowed: {sorted(allowed)}"
-            )
-        if local_model is None and online_model is None:
-            raise ConfigurationError(
-                "At least one model must be configured: local_model or online_model."
-            )
+        if not transcript_only:
+            allowed = {"local_first", "online_first", "local_only", "online_only"}
+            if provider_policy not in allowed:
+                raise ConfigurationError(
+                    f"Invalid provider policy '{provider_policy}'. Allowed: {sorted(allowed)}"
+                )
+            if local_model is None and online_model is None:
+                raise ConfigurationError(
+                    "At least one model must be configured: local_model or online_model."
+                )
 
         logger.info("Starting note generation for URL: %s", url)
 
@@ -102,6 +104,26 @@ class VideoNotesOrchestrator:
             logger.info("Successfully extracted subtitles in language: %s", transcript.language)
 
         effective_language = transcript.language if language in {None, "auto"} else language
+
+        if transcript_only:
+            transcript_text = "\n".join(
+                f"[{self._fmt_ts(s.start)}] {s.text}" for s in transcript.segments
+            )
+            logger.info(
+                "Transcript-only mode — returning raw transcript (%d segments)",
+                len(transcript.segments),
+            )
+            return NoteResult(
+                url=metadata.url,
+                title=metadata.title,
+                language=effective_language,
+                note_markdown=transcript_text,
+                transcript_source=transcript.source,
+                provider_used="",
+                model_used="",
+                duration_sec=metadata.duration_sec,
+                warnings=warnings,
+            )
 
         providers = self._provider_candidates(
             policy=provider_policy,
@@ -166,6 +188,14 @@ class VideoNotesOrchestrator:
 
     def render(self, output_format: OutputFormat, result: NoteResult) -> str:
         return self._noter_registry.note(output_format, result)
+
+    @staticmethod
+    def _fmt_ts(seconds: float) -> str:
+        """Format seconds to HH:MM:SS for transcript output."""
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        secs = int(seconds % 60)
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
 
     @staticmethod
     def _provider_candidates(
